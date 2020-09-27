@@ -1,9 +1,10 @@
 import React, {useEffect} from 'react';
-import {Select, List, Divider, Card, Form, Input, Tooltip} from 'antd';
+import {Select, List, Divider, Card, Form, Input, Tooltip, Table, Tabs} from 'antd';
 import {DemoState} from './data';
 import {ConnectProps} from "@@/plugin-dva/connect";
 import {connect} from "umi";
 const { Option } = Select;
+const {TabPane} = Tabs
 
 interface SelectionOption {
   key: string,
@@ -62,6 +63,18 @@ const Demo: React.FC<DemoProps> = (props) => {
     wrapperCol: { span: 16 },
   };
 
+  const columns = [
+    {
+      title: 'key',
+      dataIndex: 'key',
+      key: 'key'
+    }, {
+      title: 'value',
+      dataIndex: 'value',
+      key: 'value'
+    },
+  ]
+
   return (
     <div>
       <div><span>Select</span>
@@ -98,9 +111,26 @@ const Demo: React.FC<DemoProps> = (props) => {
           {...layout}
           name='basic'
         >
-          <Form.Item label='name' name='name'><Input defaultValue={selectedValue} value={selectedValue} placeholder='enter your username'/></Form.Item>
-          <Form.Item label='password' name='password'><Input.Password placeholder='enter your password'/></Form.Item>
+          <Form.Item label='name' name='name'>
+            {/*<Input defaultValue={selectedValue} value={selectedValue} placeholder='enter your username'/>*/}
+            <div>{selectedValue}</div>
+          </Form.Item>
+          <Form.Item label='password' name='password'>
+            <Input.Password placeholder='enter your password'/>
+          </Form.Item>
         </Form>
+      </div>
+      <Divider/>
+      <div><span>Table</span>
+        <Table dataSource={selections} columns={columns}/>
+      </div>
+      <Divider/>
+      <div><span>Tabs</span>
+        <Tabs defaultActiveKey={selectedValue+''} activeKey={selectedValue+''}>
+          {selections.map(element => (
+            <TabPane tab={element.key} key={element.key}>{element.value}</TabPane>
+          ))}
+        </Tabs>
       </div>
     </div>
   );
