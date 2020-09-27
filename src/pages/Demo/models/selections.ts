@@ -7,9 +7,11 @@ export interface SelectionsType {
   state: DemoState,
   effects: {
     fetch: Effect;
+    changeSelectedValue: Effect;
   };
   reducers: {
     list: Reducer<DemoState>;
+    selectedValue: Reducer<DemoState>;
   };
 
 }
@@ -18,6 +20,7 @@ const SelectionsModel: SelectionsType = {
   namespace: 'selections',
   state: {
     selections: [],
+    selectedValue: 1,
   },
   effects: {
     *fetch(_, { call, put }) {
@@ -27,6 +30,12 @@ const SelectionsModel: SelectionsType = {
         selections: response,
       });
     },
+    *changeSelectedValue({value}, {call, put}) {
+        yield put({
+          type: 'selectedValue',
+          selectedValue: value
+        })
+    },
   },
   reducers: {
     list(state, {selections}) {
@@ -34,6 +43,12 @@ const SelectionsModel: SelectionsType = {
         ...state,
         selections: selections || [],
       };
+    },
+    selectedValue(state, {selectedValue}) {
+      return {
+        ...state,
+        selectedValue: selectedValue
+      }
     },
   }
 }

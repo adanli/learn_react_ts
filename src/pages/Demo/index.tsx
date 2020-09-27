@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import { Select, List, Divider, Card } from 'antd';
+import React, {useEffect} from 'react';
+import {Select, List, Divider, Card, Form, Input, Tooltip} from 'antd';
 import {DemoState} from './data';
 import {ConnectProps} from "@@/plugin-dva/connect";
 import {connect} from "umi";
@@ -19,6 +19,7 @@ interface DemoProps extends ConnectProps {
   loading?: boolean;
   selections: SelectionOption[],
   lists: ListOption[],
+  selectedValue: number,
 }
 
 
@@ -28,18 +29,21 @@ const Demo: React.FC<DemoProps> = (props) => {
     dispatch,
     selections,
     lists,
+    selectedValue,
   } = props
 
-  const defaultSelectedKey: DemoState = {key: 1, selectedValue: 3}
+  // const defaultSelectedKey: DemoState = {key: 1, selectedValue: 3}
 
-  const [selectedKey, setSelectedKey] = useState<DemoState>(defaultSelectedKey)
+  // const [selectedKey, setSelectedKey] = useState<DemoState>(defaultSelectedKey)
 
   function handleChange(value:any) {
     console.log(value)
-    setSelectedKey({
-      selectedValue: value,
-      key: selectedKey.key?selectedKey.key + 1:1
-    })
+    if(dispatch) {
+      dispatch({
+        type: 'selections/changeSelectedValue',
+        value: value,
+      })
+    }
   }
 
   useEffect(() => {
@@ -53,13 +57,17 @@ const Demo: React.FC<DemoProps> = (props) => {
     }
   }, []);
 
+  const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+  };
 
   return (
     <div>
       <div><span>Select</span>
         <Select
-          defaultValue={selectedKey.selectedValue}
-          value={selectedKey?.selectedValue}
+          defaultValue={selectedValue}
+          value={selectedValue}
           style={{
             width: '100%',
           }}
@@ -78,11 +86,25 @@ const Demo: React.FC<DemoProps> = (props) => {
       </div>
       <Divider/>
       <div><span>Card</span>
-        <Card></Card>
+        <Card title={selectedValue} bordered style={{width: '100%'}}>
+          {lists.map(_ => <p style={{backgroundColor: `${parseInt(_.value)==selectedValue?'red':'white'}`}}>
+            {parseInt(_.value)==selectedValue?<Tooltip title={_.value}>{_.value}</Tooltip>:`${_.value}`}
+          </p>)}
+        </Card>
+      </div>
+      <Divider/>
+      <div><span>Form</span>
+        <Form
+          {...layout}
+          name='basic'
+        >
+          <Form.Item label='name' name='name'><Input defaultValue={selectedValue} value={selectedValue} placeholder='enter your username'/></Form.Item>
+          <Form.Item label='password' name='password'><Input.Password placeholder='enter your password'/></Form.Item>
+        </Form>
       </div>
     </div>
   );
 };
 
 // export default Demo;
-export default connect(({ selections, lists }: DemoState) => ({ ...selections, ...lists }))(Demo);
+export default connect(({ selections, lists, selectedValue }: DemoState) => ({ ...selections, ...lists }))(Demo);
